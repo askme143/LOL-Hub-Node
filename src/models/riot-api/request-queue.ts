@@ -1,8 +1,10 @@
 import axios, { AxiosError } from 'axios';
+import { assert } from 'chai';
 
 interface Request {
   url: string;
-  callback: (_data: any) => any;
+  promise: Promise<any> | null;
+  complete: ((data: any) => any) | null;
 }
 
 class RequestQueue {
@@ -29,15 +31,23 @@ class RequestQueue {
     this.maxRequest = maxRequest;
   }
 
-  push(url: string, callback: (_data: any) => any) {
-    this.reqQueue.push({ url, callback });
+  push(url: string) {
+    let request: Request = { url: url, promise: null, complete: null };
+
+    request.promise = new Promise((resolve) => {
+      request.complete = (data: any) => {
+        resolve(data);
+      };
+    });
+
+    this.reqQueue.push(request);
     this.startWorking();
+
+    return request.promise;
   }
 
   private startWorking() {
-    if (this.working) {
-      return;
-    } else {
+    if (!this.working) {
       this.working = true;
       this.distributeTask();
     }
@@ -60,6 +70,8 @@ class RequestQueue {
   }
 
   private async work(request: Request) {
+    if (request.complete === null) return;
+
     const url = request.url;
 
     const response = await axios
@@ -68,24 +80,22 @@ class RequestQueue {
         if (error.response && error.response.status == 404) {
           return null;
         } else {
-          throw error;
+          console.log(error);
+          return null;
         }
       });
 
     if (response === null) {
-      request.callback(null);
+      request.complete(null);
+    } else {
+      request.complete(response.data);
+    }
 
+    setTimeout(() => {
       const idx = this.taskQueue.indexOf(request);
       if (idx > -1) this.taskQueue.splice(idx, 1);
-    } else {
-      request.callback(response.data);
-
-      setTimeout(() => {
-        const idx = this.taskQueue.indexOf(request);
-        if (idx > -1) this.taskQueue.splice(idx, 1);
-        this.startWorking();
-      }, 1000);
-    }
+      this.startWorking();
+    }, 1000);
   }
 }
 

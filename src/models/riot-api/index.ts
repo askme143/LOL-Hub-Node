@@ -1,4 +1,3 @@
-import axios, { AxiosError } from 'axios';
 import RequestQueue from './request-queue';
 import * as T from './types';
 
@@ -22,23 +21,9 @@ class RiotAPI {
       'https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/' +
       encodeURI(name);
 
-    this.requestQueue.push(url, () => {});
+    const response = await this.requestQueue.push(url);
 
-    const response = await axios
-      .get(url, this.requestHeader)
-      .catch((error: AxiosError) => {
-        if (error.response && error.response.status == 404) {
-          return null;
-        } else {
-          throw error;
-        }
-      });
-
-    if (response === null) {
-      return null;
-    } else {
-      return response.data as T.Summoner;
-    }
+    return response as T.Summoner | null;
   }
 }
 
