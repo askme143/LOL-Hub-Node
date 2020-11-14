@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import { assert } from 'chai';
 
 interface Request {
   url: string;
@@ -8,16 +7,8 @@ interface Request {
 }
 
 class RequestQueue {
-  private apiKey: string = '';
-  private requestHeader = {
-    headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Whale/2.8.107.16 Safari/537.36',
-      'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-      'Accept-Charset': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'X-Riot-Token': this.apiKey,
-    },
-  };
+  private apiKey: string;
+  private requestHeader: any;
 
   private maxRequest: number = 0; // Max request per second
 
@@ -29,6 +20,15 @@ class RequestQueue {
   constructor(apiKey: string, maxRequest: number) {
     this.apiKey = apiKey;
     this.maxRequest = maxRequest;
+    this.requestHeader = {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Whale/2.8.107.16 Safari/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Charset': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'X-Riot-Token': this.apiKey,
+      },
+    };
   }
 
   push(url: string) {
