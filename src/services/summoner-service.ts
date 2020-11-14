@@ -18,10 +18,12 @@ class SummonerService {
   async getSummoner(name: string): Promise<SummonerData | null> {
     name = name.replace(/ /gi, '');
 
-    let summoner = await this.SummonerModel.findOneByName(name).catch(() => {
-      /* Cannot handle. LOG error */
-      return null;
-    });
+    let summoner = await this.SummonerModel.findOneByName(name).catch(
+      (error) => {
+        /* Cannot handle. LOG error */
+        console.log(error);
+      }
+    );
 
     /* In mongodb */
     if (summoner) {
