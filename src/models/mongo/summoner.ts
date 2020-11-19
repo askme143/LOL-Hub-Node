@@ -1,31 +1,39 @@
-import { prop, ReturnModelType } from '@typegoose/typegoose';
-import { Service } from 'typedi';
+import { index, prop, ReturnModelType } from '@typegoose/typegoose';
 
-@Service()
+@index({ puuid: 1 }, { unique: true })
 class Summoner {
   @prop()
-  public ID!: string;
-
-  @prop()
-  public accountID!: string;
-
-  @prop()
   public puuid!: string;
-
   @prop()
   public name!: string;
-
   @prop()
   public shortName!: string;
 
   @prop()
-  public profileIconID!: number;
+  public soloTier!: string;
+  @prop()
+  public soloLp!: number;
+  @prop()
+  public soloWins!: number;
+  @prop()
+  public soloLosses!: number;
 
   @prop()
-  public revisionDate!: number;
+  public flexTier!: string;
+  @prop()
+  public flexLp!: number;
+  @prop()
+  public flexWins!: number;
+  @prop()
+  public flexLosses!: number;
 
+  @prop()
+  public profileIconID!: number;
   @prop()
   public summonerLevel!: number;
+
+  @prop()
+  public updateTime!: number;
 
   public static async findOneByName(
     this: ReturnModelType<typeof Summoner>,
@@ -33,6 +41,13 @@ class Summoner {
   ) {
     const shortName = name.replace(/ /gi, '');
     return this.findOne({ shortName }).exec();
+  }
+
+  public static async findOneByPUUID(
+    this: ReturnModelType<typeof Summoner>,
+    puuid: string
+  ) {
+    return this.findOne({ puuid }).exec();
   }
 }
 

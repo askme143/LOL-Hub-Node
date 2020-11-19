@@ -6,7 +6,7 @@
   "scripts": {
     "prod": "npm run build && node src/index.js",
     "build": "tsc",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon -L src/index.ts",
     "test": "mocha -r node_modules/ts-node/register ./test/*.spec.ts"
   },
   "author": "",

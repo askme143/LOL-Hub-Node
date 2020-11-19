@@ -4,6 +4,7 @@ interface Request {
   url: string;
   promise: Promise<any> | null;
   complete: ((data: any) => any) | null;
+  reject: ((reason: any) => any) | null;
 }
 
 class RequestQueue {
@@ -11,13 +12,15 @@ class RequestQueue {
   private requestHeader: any;
 
   private maxRequest: number = 0; // Max request per second
+  private maxRequestMinute: number = 0;
 
   private reqQueue: Request[] = [];
   private taskQueue: Request[] = [];
+  private taskQueueMinute: Request[] = [];
 
   private working: boolean = false;
 
-  constructor(apiKey: string, maxRequest: number) {
+  constructor(apiKey: string, maxRequest: number, maxRequestMinute?: number) {
     this.apiKey = apiKey;
     this.maxRequest = maxRequest;
     this.requestHeader = {
@@ -28,15 +31,31 @@ class RequestQueue {
         'Accept-Charset': 'application/x-www-form-urlencoded; charset=UTF-8',
         'X-Riot-Token': this.apiKey,
       },
+      timeout: 600000,
     };
+
+    if (maxRequestMinute === undefined) {
+      this.maxRequestMinute = 60 * maxRequest;
+    } else {
+      this.maxRequestMinute = maxRequestMinute;
+    }
   }
 
   push(url: string) {
-    let request: Request = { url: url, promise: null, complete: null };
+    let request: Request = {
+      url: url,
+      promise: null,
+      complete: null,
+      reject: null,
+    };
 
-    request.promise = new Promise((resolve) => {
+    request.promise = new Promise((resolve, reject) => {
       request.complete = (data: any) => {
         resolve(data);
+      };
+
+      request.reject = (reason: any) => {
+        reject(reason);
       };
     });
 
@@ -55,13 +74,17 @@ class RequestQueue {
 
   private async distributeTask() {
     while (this.reqQueue.length > 0) {
-      if (this.taskQueue.length == this.maxRequest) {
+      if (
+        this.taskQueue.length === this.maxRequest ||
+        this.taskQueueMinute.length === this.maxRequestMinute
+      ) {
         break;
       }
       const request = this.reqQueue.shift();
       if (request === undefined) continue;
 
       this.taskQueue.push(request);
+      this.taskQueueMinute.push(request);
 
       this.work(request);
     }
@@ -70,32 +93,31 @@ class RequestQueue {
   }
 
   private async work(request: Request) {
-    if (request.complete === null) return;
+    if (request.complete === null || request.reject === null) return;
 
-    const url = request.url;
-
-    const response = await axios
-      .get(url, this.requestHeader)
-      .catch((error: AxiosError) => {
-        if (error.response && error.response.status == 404) {
-          return null;
-        } else {
-          console.log(error);
-          return null;
-        }
-      });
-
-    if (response === null) {
-      request.complete(null);
-    } else {
+    try {
+      const response = await axios.get(request.url, this.requestHeader);
       request.complete(response.data);
-    }
+    } catch (error) {
+      if (error.resoponse !== null && error.response.status === 404) {
+        console.log(request.url);
+        request.complete(null);
+      } else {
+        request.reject(error);
+      }
+    } finally {
+      setTimeout(() => {
+        const idx = this.taskQueue.indexOf(request);
+        if (idx > -1) this.taskQueue.splice(idx, 1);
+        this.startWorking();
+      }, 1000);
 
-    setTimeout(() => {
-      const idx = this.taskQueue.indexOf(request);
-      if (idx > -1) this.taskQueue.splice(idx, 1);
-      this.startWorking();
-    }, 1000);
+      setTimeout(() => {
+        const idx = this.taskQueueMinute.indexOf(request);
+        if (idx > -1) this.taskQueueMinute.splice(idx, 1);
+        this.startWorking();
+      }, 60000);
+    }
   }
 }
 

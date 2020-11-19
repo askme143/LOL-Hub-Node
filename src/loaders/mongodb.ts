@@ -8,6 +8,6 @@ db.once('open', () => {
 });
 
 mongoose.connect(
-  `mongodb://${config.mongoUser}:${config.mongoPassword}@localhost:27017/lol-hub-node?authSource=admin&readPreference=primary&ssl=false`,
+  `mongodb://${config.mongoUser}:${config.mongoPassword}@${config.mongoIP}:${config.mongoPort}/lol-hub-node?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`,
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
