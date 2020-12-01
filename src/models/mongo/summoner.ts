@@ -5,6 +5,8 @@ class Summoner {
   @prop()
   public puuid!: string;
   @prop()
+  public accountID!: string;
+  @prop()
   public name!: string;
   @prop()
   public shortName!: string;
