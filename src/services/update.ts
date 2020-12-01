@@ -141,6 +141,7 @@ async function updateSummoner(
   }
 
   summoner.puuid = summonerInfo.puuid;
+  summoner.accountID = summonerInfo.accountId;
   summoner.name = summonerInfo.name;
   summoner.shortName = summonerInfo.name.replace(/ /gi, '');
   summoner.profileIconID = summonerInfo.profileIconId;
