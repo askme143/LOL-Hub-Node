@@ -6,7 +6,7 @@ import {
 } from '@typegoose/typegoose';
 
 @index({ puuid: 1, championID: 1, queueType: 1 }, { unique: true })
-class ChampStat {
+export class ChampStat {
   @prop()
   public shortName!: string;
   @prop()
@@ -87,4 +87,4 @@ class ChampStat {
   }
 }
 
-export default ChampStat;
+export const ChampStatModel = getModelForClass(ChampStat);

@@ -3,12 +3,9 @@ import config from '../config/service-config';
 import RiotAPI from '../models/riot-api';
 import { RiotTypes } from '../models/riot-api';
 
-import Summoner from '../models/mongo/summoner';
-import ChampStat from '../models/mongo/champ-stat';
-import { getModelForClass, DocumentType } from '@typegoose/typegoose';
-
-const SummonerModel = getModelForClass(Summoner);
-const ChampStatModel = getModelForClass(ChampStat);
+import { Summoner, SummonerModel } from '../models/mongo/summoner';
+import { ChampStat, ChampStatModel } from '../models/mongo/champ-stat';
+import { DocumentType } from '@typegoose/typegoose';
 
 async function update(name: string): Promise<boolean> {
   /* Get summoner info */

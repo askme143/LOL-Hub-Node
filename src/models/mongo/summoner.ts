@@ -1,7 +1,13 @@
-import { index, prop, ReturnModelType } from '@typegoose/typegoose';
+import {
+  index,
+  prop,
+  ReturnModelType,
+  getModelForClass,
+  DocumentType,
+} from '@typegoose/typegoose';
 
 @index({ puuid: 1 }, { unique: true })
-class Summoner {
+export class Summoner {
   @prop()
   public puuid!: string;
   @prop()
@@ -53,4 +59,4 @@ class Summoner {
   }
 }
 
-export default Summoner;
+export const SummonerModel = getModelForClass(Summoner);
