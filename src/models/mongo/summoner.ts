@@ -1,7 +1,6 @@
 import {
   index,
   prop,
-  ReturnModelType,
   getModelForClass,
   DocumentType,
 } from '@typegoose/typegoose';
@@ -10,8 +9,6 @@ import {
 export class Summoner {
   @prop()
   public puuid!: string;
-  @prop()
-  public accountID!: string;
   @prop()
   public name!: string;
   @prop()
@@ -42,21 +39,6 @@ export class Summoner {
 
   @prop()
   public updateTime!: number;
-
-  public static async findOneByName(
-    this: ReturnModelType<typeof Summoner>,
-    name: string
-  ) {
-    const shortName = name.replace(/ /gi, '');
-    return this.findOne({ shortName }).exec();
-  }
-
-  public static async findOneByPUUID(
-    this: ReturnModelType<typeof Summoner>,
-    puuid: string
-  ) {
-    return this.findOne({ puuid }).exec();
-  }
 }
 
 export const SummonerModel = getModelForClass(Summoner);

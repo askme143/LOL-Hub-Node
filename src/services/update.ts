@@ -1,7 +1,7 @@
 import config from '../config/service-config';
 
-import RiotAPI from './utils/riot-api';
-import { RiotTypes } from './utils/riot-api';
+import RiotAPI from './riot-api';
+import { RiotTypes } from './riot-api';
 
 import { Summoner, SummonerModel } from '../models/mongo/summoner';
 import { ChampStat, ChampStatModel } from '../models/mongo/champ-stat';
@@ -9,7 +9,7 @@ import { DocumentType } from '@typegoose/typegoose';
 
 async function update(name: string): Promise<boolean> {
   /* Get summoner info */
-  const summonerInfo = await RiotAPI.getSummoner(name);
+  const summonerInfo = await RiotAPI.getSummoner(name, 'name');
   if (summonerInfo === null) return false;
 
   /* Get old data of summoner from DB */
@@ -31,7 +31,7 @@ async function update(name: string): Promise<boolean> {
   while (true) {
     const matchList = await RiotAPI.getMatchList(
       summonerInfo.accountId,
-      'total',
+      undefined,
       beginTime,
       0
     ).then(
@@ -138,7 +138,6 @@ async function updateSummoner(
   }
 
   summoner.puuid = summonerInfo.puuid;
-  summoner.accountID = summonerInfo.accountId;
   summoner.name = summonerInfo.name;
   summoner.shortName = summonerInfo.name.replace(/ /gi, '');
   summoner.profileIconID = summonerInfo.profileIconId;
@@ -193,7 +192,6 @@ async function updateChampStat(
 
       if (temp === null) {
         champStat = ChampStatModel.makeDefault(
-          name,
           puuid,
           key.championID,
           key.queueType,

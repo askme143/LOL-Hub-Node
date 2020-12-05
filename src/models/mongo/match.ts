@@ -14,6 +14,9 @@ export class TeamStats {
 
 export class Participant {
   @prop()
+  puuid?: string;
+
+  @prop()
   accountId!: string;
   @prop()
   summonerName!: string;

@@ -9,11 +9,6 @@ import {
 @index({ puuid: 1, championID: 1, queueType: 1 }, { unique: true })
 export class ChampStat {
   @prop()
-  public shortName!: string;
-  @prop()
-  public name!: string;
-
-  @prop()
   public puuid!: string;
   @prop()
   public championID!: number;
@@ -48,7 +43,6 @@ export class ChampStat {
 
   public static makeDefault(
     this: ReturnModelType<typeof ChampStat>,
-    name: string,
     puuid: string,
     championID: number,
     queueType: number,
@@ -57,10 +51,8 @@ export class ChampStat {
     const ChampStatModel = getModelForClass(ChampStat);
     const champStat = new ChampStatModel();
 
-    champStat.name = name;
-    champStat.shortName = name.replace(/ /gi, '');
-
     champStat.puuid = puuid;
+
     champStat.championID = championID;
     champStat.queueType = queueType;
     champStat.season = season;
