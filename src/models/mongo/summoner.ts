@@ -60,3 +60,4 @@ export class Summoner {
 }
 
 export const SummonerModel = getModelForClass(Summoner);
+export type SummonerDoc = DocumentType<Summoner>;

@@ -1,7 +1,7 @@
 import config from '../config/service-config';
 
-import RiotAPI from '../models/riot-api';
-import { RiotTypes } from '../models/riot-api';
+import RiotAPI from './utils/riot-api';
+import { RiotTypes } from './utils/riot-api';
 
 import { Summoner, SummonerModel } from '../models/mongo/summoner';
 import { ChampStat, ChampStatModel } from '../models/mongo/champ-stat';

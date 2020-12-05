@@ -3,6 +3,7 @@ import {
   ReturnModelType,
   prop,
   index,
+  DocumentType,
 } from '@typegoose/typegoose';
 
 @index({ puuid: 1, championID: 1, queueType: 1 }, { unique: true })
@@ -88,3 +89,4 @@ export class ChampStat {
 }
 
 export const ChampStatModel = getModelForClass(ChampStat);
+export type ChampStatDoc = DocumentType<ChampStat>;

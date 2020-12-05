@@ -9,7 +9,7 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.get('/:name', function (req, res) {
-  ChampStat.getChampStat(req.params.name)
+  ChampStat.get(req.params.name)
     .then((data) => {
       if (data === null) {
         res.status(404);

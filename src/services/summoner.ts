@@ -1,5 +1,5 @@
-import Summoner from '../models/mongo/summoner';
-import { getModelForClass } from '@typegoose/typegoose';
+import { SummonerModel, SummonerDoc } from '../models/mongo/summoner';
+import { pick } from './utils/pick';
 
 interface SummonerData {
   name: string;
@@ -19,44 +19,32 @@ interface SummonerData {
   updateTime: number;
 }
 
-const makeSummonerData = ({
-  name,
-  profileIconID,
-  summonerLevel,
-  soloTier,
-  soloLp,
-  soloWins,
-  soloLosses,
-  flexTier,
-  flexLp,
-  flexWins,
-  flexLosses,
-  updateTime,
-}: SummonerData) =>
-  ({
-    name,
-    profileIconID,
-    summonerLevel,
-    soloTier,
-    soloLp,
-    soloWins,
-    soloLosses,
-    flexTier,
-    flexLp,
-    flexWins,
-    flexLosses,
-    updateTime,
-  } as SummonerData);
+const keysOfSummonerData: Array<keyof SummonerData> = [
+  'name',
+  'profileIconID',
+  'summonerLevel',
+  'soloTier',
+  'soloLp',
+  'soloWins',
+  'soloLosses',
+  'flexTier',
+  'flexLp',
+  'flexWins',
+  'flexLosses',
+  'updateTime',
+];
 
-const SummonerModel = getModelForClass(Summoner);
+function pickData(summoner: SummonerDoc): SummonerData {
+  return pick(summoner, keysOfSummonerData);
+}
 
-async function getSummoner(name: string): Promise<SummonerData | null> {
+async function get(name: string) {
   const summoner = await SummonerModel.findOneByName(name);
-
   if (summoner === null) return null;
-  return makeSummonerData(summoner);
+
+  return pickData(summoner);
 }
 
 export default {
-  getSummoner,
+  get,
 };

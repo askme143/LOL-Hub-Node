@@ -1,7 +1,7 @@
-import ChampStat from '../models/mongo/champ-stat';
-import { getModelForClass } from '@typegoose/typegoose';
+import { ChampStatModel, ChampStatDoc } from '../models/mongo/champ-stat';
+import { pick } from './utils/pick';
 
-interface ChampStatRawData {
+interface ChampStatData {
   championID: number;
 
   kill: number;
@@ -18,69 +18,37 @@ interface ChampStatRawData {
   quadraKill: number;
   pentaKill: number;
 }
+const keysOfChampStatData: Array<keyof ChampStatData> = [
+  'championID',
+  'kill',
+  'death',
+  'assist',
+  'win',
+  'loose',
+  'totalCS',
+  'totalDuration',
+  'tripleKill',
+  'quadraKill',
+  'pentaKill',
+];
 
-interface ChampStatData {
-  championID: number;
-
-  kill: number;
-  death: number;
-  assist: number;
-
-  win: number;
-  loose: number;
-  winRate: string;
-
-  averageCS: string;
-  csPerMin: string;
-
-  tripleKill: number;
-  quadraKill: number;
-  pentaKill: number;
+function pickData(champStat: ChampStatDoc) {
+  return pick(champStat, keysOfChampStatData);
 }
 
-function makeChampStatData({
-  championID,
-  kill,
-  death,
-  assist,
-  win,
-  loose,
-  totalCS,
-  totalDuration,
-  tripleKill,
-  quadraKill,
-  pentaKill,
-}: ChampStatRawData) {
-  return {
-    championID,
-    kill,
-    death,
-    assist,
-    win,
-    loose,
-    winRate: (win / (win + loose)).toFixed(1),
-    averageCS: (totalCS / (win + loose)).toFixed(1),
-    csPerMin: ((totalCS * 60) / totalDuration).toFixed(1),
-    totalDuration,
-    tripleKill,
-    quadraKill,
-    pentaKill,
-  } as ChampStatData;
-}
-
-const ChampStatModel = getModelForClass(ChampStat);
-
-async function getChampStat(name: string) {
+async function get(name: string) {
   const champStats = await ChampStatModel.findByName(name);
-  const champStatDatas: ChampStatData[] = [];
 
   if (champStats === null) return [];
-  for (let i = 0; i < champStats.length; i++) {
-    champStatDatas.push(makeChampStatData(champStats[i]));
-  }
+
+  const champStatDatas = champStats.reduce((prev, curr) => {
+    prev.push(pickData(curr));
+    return prev;
+  }, [] as ChampStatData[]);
+
   return champStatDatas;
 }
 
 export default {
-  getChampStat,
+  get,
 };
