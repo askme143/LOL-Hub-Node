@@ -1,5 +1,5 @@
-import { ChampStatModel, ChampStatDoc } from '../models/mongo/champ-stat';
-import { pick } from './utils/pick';
+import { ChampStatModel, ChampStatDoc } from '../../models/mongo/champ-stat';
+import { pick } from '../utils/pick';
 
 interface ChampStatData {
   championID: number;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Update from '../../services/update';
+import Update from '../services/update';
 
 const router = Router();
 

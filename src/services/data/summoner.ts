@@ -1,7 +1,7 @@
-import { SummonerModel, SummonerDoc } from '../models/mongo/summoner';
-import { SummonerError } from './errors';
-import RiotAPI, { RiotTypes } from './riot-api';
-import { pick } from './utils/pick';
+import { SummonerModel, SummonerDoc } from '../../models/mongo/summoner';
+import { SummonerError, SummonerErrorCase } from '../errors';
+import RiotAPI, { RiotTypes } from '../riot-api';
+import { pick } from '../utils/pick';
 
 interface SummonerData {
   name: string;
@@ -133,3 +133,5 @@ export default {
   update,
   remove,
 };
+
+export { SummonerError, SummonerErrorCase };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Summoner from '../../services/summoner';
+import ChampStat from '../services/data/champ-stat';
 
 const router = Router();
 
@@ -9,7 +9,7 @@ router.use(function timeLog(req, res, next) {
 });
 
 router.get('/:name', function (req, res) {
-  Summoner.get(req.params.name)
+  ChampStat.get(req.params.name)
     .then((data) => {
       if (data === null) {
         res.status(404);

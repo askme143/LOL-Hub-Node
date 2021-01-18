@@ -13,7 +13,9 @@ async function update(name: string): Promise<boolean> {
   if (summonerInfo === null) return false;
 
   /* Get old data of summoner from DB */
-  const oldSummoner = await SummonerModel.findOneByPUUID(summonerInfo.puuid);
+  const oldSummoner = await SummonerModel.findOne({
+    puuid: summonerInfo.puuid,
+  }).exec();
 
   /* Decide beginning point of a history searching */
   let beginTime: number;
@@ -46,7 +48,9 @@ async function update(name: string): Promise<boolean> {
 
     for (let i = 0; i < matchList.matches.length; i++) {
       const gameID = matchList.matches[i].gameId;
-      matchInfoPromises.push(RiotAPI.getMatch(gameID));
+      matchInfoPromises.push(
+        RiotAPI.getMatch(gameID) as Promise<RiotTypes.Match>
+      );
     }
 
     if (matchList.totalGames === matchList.endIndex) break;
@@ -106,23 +110,24 @@ async function updateSummoner(
   let solo = false;
   let flex = false;
 
-  for (let i = 0; i < leagueInfo.length; i++) {
-    const leagueEntry = leagueInfo[i];
+  if (leagueInfo !== null)
+    for (let i = 0; i < leagueInfo.length; i++) {
+      const leagueEntry = leagueInfo[i];
 
-    if (leagueEntry.queueType.includes('FLEX')) {
-      summoner.flexTier = leagueEntry.tier + ' ' + leagueEntry.rank;
-      summoner.flexLp = leagueEntry.leaguePoints;
-      summoner.flexWins = leagueEntry.wins;
-      summoner.flexLosses = leagueEntry.losses;
-      flex = true;
-    } else {
-      summoner.soloTier = leagueEntry.tier + ' ' + leagueEntry.rank;
-      summoner.soloLp = leagueEntry.leaguePoints;
-      summoner.soloWins = leagueEntry.wins;
-      summoner.soloLosses = leagueEntry.losses;
-      solo = true;
+      if (leagueEntry.queueType.includes('FLEX')) {
+        summoner.flexTier = leagueEntry.tier + ' ' + leagueEntry.rank;
+        summoner.flexLp = leagueEntry.leaguePoints;
+        summoner.flexWins = leagueEntry.wins;
+        summoner.flexLosses = leagueEntry.losses;
+        flex = true;
+      } else {
+        summoner.soloTier = leagueEntry.tier + ' ' + leagueEntry.rank;
+        summoner.soloLp = leagueEntry.leaguePoints;
+        summoner.soloWins = leagueEntry.wins;
+        summoner.soloLosses = leagueEntry.losses;
+        solo = true;
+      }
     }
-  }
 
   if (!flex) {
     summoner.flexTier = 'unranked';
